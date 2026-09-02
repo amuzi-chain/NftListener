@@ -43,6 +43,23 @@ class PayloadJsonTest {
     }
 
     @Test
+    fun escapesRemainingControlCharacters() {
+        val title = "a\u0000b\u0008c\u000cf"
+        val json = PayloadJson.encode(sample.copy(title = title))
+        assertTrue(json.contains("\"title\":\"a\\u0000b\\u0008c\\u000cf\""))
+
+        val titleStart = json.indexOf("\"title\":\"") + "\"title\":\"".length
+        val titleEnd = json.indexOf('"', titleStart)
+        val titleValue = json.substring(titleStart, titleEnd)
+        assertTrue(titleValue.contains("\\u0000"))
+        assertTrue(titleValue.contains("\\u0008"))
+        assertTrue(titleValue.contains("\\u000c"))
+        assertTrue(!titleValue.contains('\u0000'))
+        assertTrue(!titleValue.contains('\u0008'))
+        assertTrue(!titleValue.contains('\u000c'))
+    }
+
+    @Test
     fun encodeIsStableObject() {
         val json = PayloadJson.encode(sample)
         assertEquals('{', json.first())

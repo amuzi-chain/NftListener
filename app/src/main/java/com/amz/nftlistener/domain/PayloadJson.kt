@@ -47,7 +47,14 @@ object PayloadJson {
                 '\n' -> out.append("\\n")
                 '\r' -> out.append("\\r")
                 '\t' -> out.append("\\t")
-                else -> out.append(ch)
+                else -> {
+                    if (ch < '\u0020') {
+                        out.append("\\u")
+                        out.append(ch.code.toString(16).padStart(4, '0'))
+                    } else {
+                        out.append(ch)
+                    }
+                }
             }
         }
         return out.toString()
