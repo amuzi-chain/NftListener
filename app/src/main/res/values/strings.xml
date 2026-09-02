@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">NftListener</string>
+    <string name="permission_on">正在监听</string>
+    <string name="permission_off">需要通知使用权</string>
+    <string name="permission_action">去系统设置开启</string>
+    <string name="webhook_url">Webhook URL</string>
+    <string name="webhook_token">Bearer Token（可空）</string>
+    <string name="save">保存</string>
+    <string name="test_upload">测试上报</string>
+    <string name="recent_logs">最近上报</string>
+    <string name="saved">已保存</string>
 </resources>
