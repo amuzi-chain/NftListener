@@ -16,6 +16,10 @@ import java.util.UUID
 class NotificationCaptureService : NotificationListenerService() {
     companion object {
         var isConnected = false
+            private set(value) {
+                field = value
+                // 这里可以扩展更复杂的监听逻辑
+            }
     }
 
     private val dedupe = NotificationDedupe()
@@ -32,6 +36,10 @@ class NotificationCaptureService : NotificationListenerService() {
         isConnected = false
         CaptureLog.w("listener disconnected")
         super.onListenerDisconnected()
+    }
+
+    override fun onStartCommand(intent: android.content.Intent?, flags: Int, startId: Int): Int {
+        return START_STICKY // 尝试让服务更持久
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {

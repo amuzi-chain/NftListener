@@ -10,4 +10,7 @@
     <string name="test_upload">测试上报</string>
     <string name="recent_logs">最近上报</string>
     <string name="saved">已保存</string>
+    <string name="service_status_label">服务运行状态: </string>
+    <string name="service_status_connected">已连接 (监听中)</string>
+    <string name="service_status_disconnected">未连接 (点击尝试修复)</string>
 </resources>
