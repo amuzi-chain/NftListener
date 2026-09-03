@@ -10,12 +10,23 @@
         android:id="@+id/logTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceBodyLarge" />
+        android:textColor="@color/log_title"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/logContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="@color/log_title"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/logMeta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:textAppearance="?attr/textAppearanceBodySmall" />
+        android:layout_marginTop="4dp"
+        android:textColor="@color/log_meta"
+        android:textSize="12sp" />
 </LinearLayout>

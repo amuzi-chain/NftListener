@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">NftListener</string>
-    <string name="permission_on">正在监听</string>
-    <string name="permission_off">需要通知使用权</string>
+    <string name="permission_on">正在监听通知</string>
+    <string name="permission_off">需要通知使用权，否则收不到任何推送</string>
     <string name="permission_action">去系统设置开启</string>
+    <string name="permission_action_granted">打开通知使用权设置</string>
     <string name="webhook_url">Webhook URL</string>
     <string name="webhook_token">Bearer Token（可空）</string>
     <string name="save">保存</string>

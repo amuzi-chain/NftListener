@@ -1,5 +1,6 @@
 package com.amz.nftlistener.upload
 
+import com.amz.nftlistener.capture.CaptureLog
 import com.amz.nftlistener.domain.UploadFailureClassifier
 import com.amz.nftlistener.domain.UploadOutcome
 import kotlinx.coroutines.Dispatchers
@@ -26,9 +27,11 @@ class WebhookUploader(
             }
             try {
                 client.newCall(builder.build()).execute().use { response ->
+                    CaptureLog.i("http ${response.code} url=$url bytes=${jsonBody.length} hasToken=${token.isNotEmpty()}")
                     UploadFailureClassifier.fromHttpCode(response.code)
                 }
             } catch (error: Throwable) {
+                CaptureLog.e("http failed url=$url", error)
                 UploadFailureClassifier.fromThrowable(error)
             }
         }

@@ -1,5 +1,6 @@
 package com.amz.nftlistener.data
 
+import com.amz.nftlistener.capture.CaptureLog
 import com.amz.nftlistener.domain.NotificationFields
 import com.amz.nftlistener.domain.NotificationParser
 import com.amz.nftlistener.domain.PayloadJson
@@ -19,8 +20,10 @@ class NotificationRepository(
     val logs: Flow<List<UploadLogEntity>> = store.observeRecentLogs(200)
 
     suspend fun handleIncoming(fields: NotificationFields) {
+        CaptureLog.i("handleIncoming eventId=${fields.eventId} configured=${settings.isConfigured()} online=${networkChecker.isOnline()}")
         if (!settings.isConfigured()) {
-            insertLog(fields, LogStatus.FAILED, "未配置")
+            CaptureLog.w("skip enqueue, webhook URL not configured eventId=${fields.eventId}")
+            insertLog(fields, LogStatus.FAILED, "webhook未配置")
             store.trimLogs(200)
             return
         }
@@ -28,11 +31,13 @@ class NotificationRepository(
             val oldest = store.oldestPending()
             if (oldest != null) {
                 store.deletePending(oldest.eventId)
+                CaptureLog.w("queue overflow, drop oldest eventId=${oldest.eventId}")
                 store.insertLog(
                     UploadLogEntity(
                         eventId = oldest.eventId,
                         postedAt = oldest.postedAt,
                         appLabel = oldest.appLabel,
+                        packageName = oldest.packageName,
                         title = oldest.title,
                         status = LogStatus.FAILED.name,
                         reason = "队列溢出",
@@ -55,9 +60,11 @@ class NotificationRepository(
         insertLog(fields, LogStatus.QUEUED, "")
         store.trimLogs(200)
         if (!networkChecker.isOnline()) {
+            CaptureLog.w("offline, queued eventId=${fields.eventId}")
             scheduler.schedule()
             return
         }
+        CaptureLog.i("upload now eventId=${fields.eventId} url=${settings.webhookUrl()}")
         applyOutcome(
             fields.eventId,
             sender.upload(settings.webhookUrl(), settings.token(), PayloadJson.encode(fields)),
@@ -78,10 +85,12 @@ class NotificationRepository(
             channelId = "test",
             isOngoing = false,
         )
+        CaptureLog.i("enqueue test event postedAt=$now")
         handleIncoming(fields)
     }
 
     suspend fun drainPending(): DrainResult {
+        CaptureLog.i("drainPending configured=${settings.isConfigured()}")
         if (!settings.isConfigured()) return DrainResult.DONE
         var hasRetryable = false
         for (event in store.allPendingOldestFirst()) {
@@ -97,6 +106,7 @@ class NotificationRepository(
     }
 
     private suspend fun applyOutcome(eventId: String, outcome: UploadOutcome): DrainResult {
+        CaptureLog.outcome(eventId, outcome)
         return when (outcome) {
             UploadOutcome.Success -> {
                 store.deletePending(eventId)
@@ -121,7 +131,11 @@ class NotificationRepository(
                 eventId = fields.eventId,
                 postedAt = fields.postedAt,
                 appLabel = fields.appLabel,
+                packageName = fields.packageName,
                 title = fields.title,
+                text = fields.text,
+                subText = fields.subText,
+                channelId = fields.channelId,
                 status = status.name,
                 reason = reason,
                 loggedAt = System.currentTimeMillis(),
